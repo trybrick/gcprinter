@@ -84,7 +84,7 @@
 })({
 1: [function(require, module, exports) {
 (function() {
-  var Emitter, debug, gciprinter, gcprinter, initRequiredMsg, isReady, isSecureSite, log, trim, win;
+  var Emitter, debug, gciprinter, gcprinter, initRequiredMsg, isDocReady, isSecureSite, log, trim, win;
 
   Emitter = require('emitter');
 
@@ -96,7 +96,7 @@
 
   win = window;
 
-  isReady = false;
+  isDocReady = false;
 
   isSecureSite = win.location.protocol.indexOf("https") >= 0;
 
@@ -114,7 +114,7 @@
 
     gciprinter.prototype.api = 'https://clientapi.gsn2.com/api/v1/ShoppingList/CouponPrint';
 
-    gciprinter.prototype.hasInit = false;
+    gciprinter.prototype.isReady = false;
 
     gciprinter.prototype.debug = debug;
 
@@ -127,6 +127,10 @@
     function gciprinter() {
       var myHtml, sc, scExtension, self;
       self = this;
+      if (!isDocReady) {
+        myHtml = '<input type="hidden" id="https-supported" name="https-supported" value="true">';
+        document.write("<!--[if (lte IE 9) & (cpbrkpie) & (gte cpbrkpie 5.0200)]>\n" + myHtml + "\n<![endif]-->");
+      }
       sc = "https://cdn.cpnscdn.com/static/libraries/js/printcontrol_v3";
       scExtension = debug.enabled('gcprinter') ? ".js" : ".min.js";
       jQuery.ajax({
@@ -140,10 +144,6 @@
           }, 100);
         }
       });
-      if (!isReady) {
-        myHtml = '<input type="hidden" id="https-supported" name="https-supported" value="true">';
-        document.write("<!--[if (lte IE 9) & (cpbrkpie) & (gte cpbrkpie 5.0200)]>\n" + myHtml + "\n<![endif]-->");
-      }
     }
 
 
@@ -171,7 +171,7 @@
     gciprinter.prototype.print = function(siteId, coupons) {
       var deviceId, payload, self;
       self = this;
-      if (!self.hasInit) {
+      if (!self.isReady) {
         gcprinter.log("print - false - " + initRequiredMsg);
         return false;
       }
@@ -252,7 +252,7 @@
     gciprinter.prototype.hasPlugin = function() {
       var self;
       self = this;
-      if (!self.hasInit) {
+      if (!self.isReady) {
         gcprinter.log("hasPlugin - false - " + initRequiredMsg);
         return false;
       }
@@ -268,7 +268,7 @@
     gciprinter.prototype.getDeviceId = function() {
       var self;
       self = this;
-      if (!self.hasInit) {
+      if (!self.isReady) {
         gcprinter.log("getDeviceId - 0 - " + initRequiredMsg);
         return 0;
       }
@@ -284,11 +284,47 @@
     gciprinter.prototype.isPrinterSupported = function() {
       var self;
       self = this;
-      if (!self.hasInit) {
+      if (!self.isReady) {
         gcprinter.log("isPrinterSupported - false - " + initRequiredMsg);
         return false;
       }
       return COUPONSINC.printcontrol.isPrinterSupported();
+    };
+
+
+    /**
+     * determine if plugin is blocked
+     * @return {Boolean}
+     */
+
+    gciprinter.prototype.isPluginBlocked = function() {
+      var result, self;
+      self = this;
+      if (!self.isReady) {
+        gcprinter.log("isPluginBlocked - false - " + initRequiredMsg);
+        return false;
+      }
+      result = !self.isWebSocket();
+      if (result) {
+        result = COUPONSINC.printcontrol_plugin.isPluginBlocked();
+      }
+      return result;
+    };
+
+
+    /**
+     * determine if websocket
+     * @return {Boolean}
+     */
+
+    gciprinter.prototype.isWebSocket = function() {
+      var self;
+      self = this;
+      if (!self.isReady) {
+        gcprinter.log("isWebSocket - false - " + initRequiredMsg);
+        return false;
+      }
+      return COUPONSINC.printcontrol.getManager() === 'socket';
     };
 
 
@@ -300,7 +336,7 @@
     gciprinter.prototype.getStatus = function() {
       var self;
       self = this;
-      if (!self.hasInit) {
+      if (!self.isReady) {
         gcprinter.log("getStatus - false - " + initRequiredMsg);
         return false;
       }
@@ -316,11 +352,11 @@
     gciprinter.prototype.init = function() {
       var cb, self;
       self = this;
-      if (!gcprinter.hasInit && (typeof COUPONSINC !== "undefined" && COUPONSINC !== null)) {
+      if (!gcprinter.isReady && (typeof COUPONSINC !== "undefined" && COUPONSINC !== null)) {
         gcprinter.log("init starting");
         cb = function() {
           gcprinter.log("init completed");
-          gcprinter.hasInit = true;
+          gcprinter.isReady = true;
           return gcprinter.emit('initcomplete', this);
         };
         jQuery.when(COUPONSINC.printcontrol.init(self.key, isSecureSite)).done(cb);
@@ -341,7 +377,7 @@
   }
 
   jQuery(document).ready(function() {
-    isReady = true;
+    isDocReady = true;
     return gcprinter.init();
   });
 
