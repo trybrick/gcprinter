@@ -118,6 +118,15 @@
 
     gciprinter.prototype.debug = debug;
 
+    gciprinter.prototype.isWindows = navigator.platform.indexOf('Win') > -1;
+
+    gciprinter.prototype.isMac = navigator.platform.indexOf('Mac') > -1;
+
+    gciprinter.prototype.dl = {
+      win: "http://cdn.coupons.com/ftp.coupons.com/partners/CouponPrinter.exe",
+      mac: "http://cdn.coupons.com/ftp.coupons.com/safari/MacCouponPrinterWS.dmg"
+    };
+
 
     /**
      * create a new instance of gciprinter
@@ -175,10 +184,15 @@
         gcprinter.log("print - false - " + initRequiredMsg);
         return false;
       }
-      win.gcprinterCallback = self.printCallback;
       deviceId = self.getDeviceId();
-      payload = trim(encodeURIComponent(coupons.join(',')));
+      if (deviceId < 1) {
+        gcprinter.log("printinvalid - bad device id " + deviceId);
+        gcprinter.emit('printinvalid', 'gsn-device');
+        return;
+      }
+      payload = trim((coupons || []).join(','));
       if (payload.length > 0) {
+        payload = encodeURIComponent(payload);
         jQuery.ajax({
           type: 'GET',
           url: self.api + "/" + siteId + "/" + deviceId + "?callback=?&coupons=" + payload,
@@ -187,20 +201,21 @@
           var evt;
           if (svrRsp.Success) {
             evt = {
-              cancel: false,
-              data: svrRsp
+              cancel: false
             };
-            gcprinter.emit('printing', evt);
             if (!evt.cancel) {
+              gcprinter.emit('printing', evt, svrRsp);
               return gcprinter.printWithToken(svrRsp.Token, svrRsp);
+            } else {
+              return gcprinter.emit('printfail', 'gsn-cancel', svrRsp);
             }
           } else {
-            return gcprinter.emit('printfail', svrRsp);
+            return gcprinter.emit('printfail', 'gsn-server', svrRsp);
           }
         });
       } else {
-        gcprinter.log("printcancel - no coupon payload");
-        gcprinter.emit('printcancel');
+        gcprinter.log("printinvalid - no coupon payload");
+        gcprinter.emit('printinvalid', 'gsn-no-coupon');
       }
       return true;
     };
@@ -216,14 +231,14 @@
     gciprinter.prototype.printWithToken = function(printToken, rsp) {
       var self;
       self = this;
-      if (printToken !== 'no token') {
-        COUPONSINC.printcontrol.printCoupons(printToken, function(e) {
-          gcprinter.log("printed " + e);
+      COUPONSINC.printcontrol.printCoupons(printToken, function(e) {
+        gcprinter.log("printed " + e);
+        if (e === 'blocked') {
+          return gcprinter.emit('printfail', e, rsp);
+        } else {
           return gcprinter.emit('printed', e, rsp);
-        });
-      } else {
-        gcprinter.emit('printed', 'no token', rsp);
-      }
+        }
+      });
       return self;
     };
 
@@ -313,7 +328,7 @@
 
 
     /**
-     * determine if websocket
+     * determine if plugin uses websocket
      * @return {Boolean}
      */
 
@@ -341,6 +356,22 @@
         return false;
       }
       return COUPONSINC.printcontrol.getStatusCode();
+    };
+
+
+    /**
+     * get the plugin download url
+     * @param  {Boolean} isWindows true if windows
+     * @return {[string}            the download URL
+     */
+
+    gciprinter.prototype.getDownload = function(isWindows) {
+      var self;
+      self = this;
+      if (isWindows || self.isWindows) {
+        return self.dl.win;
+      }
+      return self.dl.mac;
     };
 
 

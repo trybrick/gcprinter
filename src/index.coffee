@@ -16,6 +16,11 @@ class gciprinter
   api: 'https://clientapi.gsn2.com/api/v1/ShoppingList/CouponPrint'
   isReady: false
   debug: debug
+  isWindows: navigator.platform.indexOf('Win') > -1
+  isMac: navigator.platform.indexOf('Mac') > -1
+  dl: 
+    win: "http://cdn.coupons.com/ftp.coupons.com/partners/CouponPrinter.exe"
+    mac: "http://cdn.coupons.com/ftp.coupons.com/safari/MacCouponPrinterWS.dmg"
 
   ###*
    * create a new instance of gciprinter
@@ -62,25 +67,33 @@ class gciprinter
     if !self.isReady
       gcprinter.log "print - false - #{initRequiredMsg}"
       return false
-    win.gcprinterCallback = self.printCallback
+
     deviceId = self.getDeviceId()
-    payload = trim(encodeURIComponent(coupons.join(',')))
+    if (deviceId < 1)
+      gcprinter.log "printinvalid - bad device id #{deviceId}"
+      gcprinter.emit('printinvalid', 'gsn-device')
+      return
+
+    payload = trim((coupons or []).join(','))
     if (payload.length > 0)
+      payload = encodeURIComponent(payload)
       jQuery.ajax
         type: 'GET'
         url: "#{self.api}/#{siteId}/#{deviceId}?callback=?&coupons=#{payload}"
         dataType: 'jsonp'
       .done (svrRsp)->
         if (svrRsp.Success)
-          evt = {cancel: false, data: svrRsp}
-          gcprinter.emit('printing', evt)
+          evt = { cancel: false }
           if !evt.cancel
+            gcprinter.emit('printing', evt, svrRsp)
             gcprinter.printWithToken svrRsp.Token, svrRsp
+          else
+            gcprinter.emit('printfail', 'gsn-cancel', svrRsp)
         else
-          gcprinter.emit('printfail', svrRsp)
+          gcprinter.emit('printfail', 'gsn-server', svrRsp)
     else
-      gcprinter.log "printcancel - no coupon payload"
-      gcprinter.emit('printcancel')
+      gcprinter.log "printinvalid - no coupon payload"
+      gcprinter.emit('printinvalid', 'gsn-no-coupon')
 
     return true
 
@@ -92,13 +105,13 @@ class gciprinter
   ###
   printWithToken: (printToken, rsp) ->
     self = @
-    if (printToken != 'no token')
-      # should have already init the printer
-      COUPONSINC.printcontrol.printCoupons printToken, (e)->
-        gcprinter.log "printed #{e}"
+    # should have already init the printer
+    COUPONSINC.printcontrol.printCoupons printToken, (e)->
+      gcprinter.log "printed #{e}"
+      if (e is 'blocked')
+        gcprinter.emit 'printfail', e, rsp
+      else
         gcprinter.emit 'printed', e, rsp
-    else
-      gcprinter.emit 'printed', 'no token', rsp
 
     return self
 
@@ -160,8 +173,9 @@ class gciprinter
     if result
       result = COUPONSINC.printcontrol_plugin.isPluginBlocked()
     return result
+
   ###*
-   * determine if websocket
+   * determine if plugin uses websocket
    * @return {Boolean}
   ###
   isWebSocket: () ->
@@ -181,6 +195,19 @@ class gciprinter
       gcprinter.log "getStatus - false - #{initRequiredMsg}"
       return false
     return COUPONSINC.printcontrol.getStatusCode()
+
+  ###*
+   * get the plugin download url
+   * @param  {Boolean} isWindows true if windows
+   * @return {[string}            the download URL
+  ###
+  getDownload: (isWindows) ->
+    self = @
+    if isWindows or self.isWindows
+      return self.dl.win
+    
+    return self.dl.mac
+
   ###*
    * initialize COUPONSINC object
    * @return {Object}

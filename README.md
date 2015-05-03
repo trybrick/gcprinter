@@ -32,8 +32,18 @@ allow callback to check if coupon printer is installed
 ### gcprinter#isPrinterSupported
 determine if printer is supported (not pdf/xps/virtual printer etc..)
 
+### gcprinter#isPluginBlocked
+determine if plugin is blocked
+
+### gcprinter#isWebSocket
+determine if plugin uses websocket
+
 ### gcprinter#getStatus
 get the current status code
+
+### gcprinter#getDownload
+get the plugin download url
+pluglin automatically detect if mac or windows and return appropriate URL
 
 ### gcprinter#on('printing', evt)
 Event occur before print began
