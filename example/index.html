@@ -11,6 +11,26 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 	<script src="../gcprinter.js"></script>
+	<script>
+	  gcprinter.debug.enable('*');
+	  gcprinter.log('exec hasPlugin: ' + gcprinter.hasPlugin())
+	  gcprinter.log('exec getDeviceId: ' + gcprinter.getDeviceId())
+	  gcprinter.log('exec isPrinterSupported: ' + gcprinter.isPrinterSupported())
+	  gcprinter.log('exec getStatusCode: ' + gcprinter.getStatus())
+	  gcprinter.on('initcomplete', function(){
+		gcprinter.log('exec hasPlugin: ' + gcprinter.hasPlugin())
+		gcprinter.log('exec getDeviceId: ' + gcprinter.getDeviceId())
+		gcprinter.log('exec isPrinterSupported: ' + gcprinter.isPrinterSupported())
+	    gcprinter.log('exec getStatusCode: ' + gcprinter.getStatus())
+	    // uncomment to test with real coupon
+	    // gcprinter.print(218, [18814396,18814173]);
+	    gcprinter.printWithToken('BQPIuxBKKC21218113010')
+	  	gcprinter.on('printed', function(){
+	      gcprinter.log('exec getStatusCode: ' + gcprinter.getStatus())
+	  	});
+	  });
+
+	</script>
 </head>
 <body>
 </body>

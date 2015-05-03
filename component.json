@@ -2,16 +2,15 @@
   "name": "gcprinter",
   "repo": "gsn/gcprinter",
   "description": "gsn coupons inc. printer",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "keywords": [
     "modal",
     "web"
   ],
   "dependencies": {
+    "visionmedia/debug": "*",
     "component/emitter": "*",
-    "component/trim": "*",
-    "segmentio/load-script": "*",
-    "segmentio/load-script-once": "*"
+    "component/trim": "*"
   },
   "development": {
     "yields/coverage": "*",

@@ -9,16 +9,31 @@ Reference jquery and gcprinter.min.js
 
 To Print:
 ```
-gcprinter.print(chainId, couponsCsv);
+gcprinter.print(chainId, couponsArray);
 ```
 
 ## API
 
+### gcprinter#print(chainId, couponsArray)
+print coupon provided site or chainid and coupons array
+
+### gcprinter#printWithToken(token)
+print coupon provided a token
+
 ### gcprinter#hasPlugin
-true if plugin is installed from cached detection
+determine if plugin is installed
+
+### gcprinter#getDeviceId
+get the plugin device id
 
 ### gcprinter#checkInstall(successCallback, failCallback)
-cause actual check for plugin existence
+allow callback to check if coupon printer is installed
+
+### gcprinter#isPrinterSupported
+determine if printer is supported (not pdf/xps/virtual printer etc..)
+
+### gcprinter#getStatus
+get the current status code
 
 ### gcprinter#on('printing', evt)
 Event occur before print began
