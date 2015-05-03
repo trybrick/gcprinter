@@ -1,0 +1,27 @@
+{
+  "name": "gcprinter",
+  "repo": "gsn/gcprinter",
+  "description": "gsn coupons inc. printer",
+  "version": "0.1.0",
+  "keywords": [
+    "modal",
+    "web"
+  ],
+  "dependencies": {
+    "component/emitter": "*",
+    "component/trim": "*",
+    "segmentio/load-script": "*",
+    "segmentio/load-script-once": "*"
+  },
+  "development": {
+    "yields/coverage": "*",
+    "component/jquery": "*",
+    "component/assert": "*",
+    "ianstormtaylor/trigger-event": "*",
+    "jkroso/equals": "*",
+    "ianstormtaylor/sinon": "duo",
+    "timoxley/next-tick": "*",
+    "yields/gravy": "*"
+  },
+  "main": "lib/index.js"
+}
