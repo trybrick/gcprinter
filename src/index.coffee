@@ -18,6 +18,7 @@ class gciprinter
   debug: debug
   isWindows: navigator.platform.indexOf('Win') > -1
   isMac: navigator.platform.indexOf('Mac') > -1
+  isChrome: /chrome/i.test(navigator.userAgent)
   dl: 
     win: "http://cdn.coupons.com/ftp.coupons.com/partners/CouponPrinter.exe"
     mac: "http://cdn.coupons.com/ftp.coupons.com/safari/MacCouponPrinterWS.dmg"
@@ -147,7 +148,11 @@ class gciprinter
     if !self.isReady
       gcprinter.log "getDeviceId - 0 - #{initRequiredMsg}"
       return 0
-    return COUPONSINC.printcontrol.getDeviceID()
+
+    if (self.cacheResult.deviceId?)
+      return self.cacheResult.deviceId
+
+    return self.cacheResult.deviceId = COUPONSINC.printcontrol.getDeviceID()
 
   ###*
    * determine if printer is supported (not pdf/xps/virtual printer etc..)
@@ -158,7 +163,11 @@ class gciprinter
     if !self.isReady
       gcprinter.log "isPrinterSupported - false - #{initRequiredMsg}"
       return false
-    return COUPONSINC.printcontrol.isPrinterSupported()
+
+    if (self.cacheResult.isPrinterSupported?)
+      return self.cacheResult.isPrinterSupported 
+    
+    return self.cacheResult.isPrinterSupported = COUPONSINC.printcontrol.isPrinterSupported()
 
   ###*
    * determine if plugin is blocked
@@ -194,6 +203,10 @@ class gciprinter
     if !self.isReady
       gcprinter.log "getStatus - false - #{initRequiredMsg}"
       return false
+    
+    if (self.initResult? and self.initResult.deviceId < 0)
+      return self.initResult.status
+
     return COUPONSINC.printcontrol.getStatusCode()
 
   ###*
@@ -216,11 +229,18 @@ class gciprinter
     self = @
     if !gcprinter.isReady and COUPONSINC?
       gcprinter.log "init starting"
-      cb = ->
+      cb = (e) ->
         gcprinter.log "init completed"
         gcprinter.isReady = true
+        gcprinter.initResult = e
+        gcprinter.cacheResult = e or {}
+
+        if e?
+          gcprinter.cacheResult.isPrinterSupported = if e.isPrinterSupported is 0 then false else true
+          gcprinter.cacheResult.deviceId = e.deviceId
+
         gcprinter.emit('initcomplete', @)
-      jQuery.when(COUPONSINC.printcontrol.init(self.key, isSecureSite)).done cb
+      jQuery.when(COUPONSINC.printcontrol.init(self.key, isSecureSite)).then cb, cb
     return self
 
 Emitter(gciprinter.prototype)

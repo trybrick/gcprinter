@@ -122,6 +122,8 @@
 
     gciprinter.prototype.isMac = navigator.platform.indexOf('Mac') > -1;
 
+    gciprinter.prototype.isChrome = /chrome/i.test(navigator.userAgent);
+
     gciprinter.prototype.dl = {
       win: "http://cdn.coupons.com/ftp.coupons.com/partners/CouponPrinter.exe",
       mac: "http://cdn.coupons.com/ftp.coupons.com/safari/MacCouponPrinterWS.dmg"
@@ -287,7 +289,10 @@
         gcprinter.log("getDeviceId - 0 - " + initRequiredMsg);
         return 0;
       }
-      return COUPONSINC.printcontrol.getDeviceID();
+      if ((self.cacheResult.deviceId != null)) {
+        return self.cacheResult.deviceId;
+      }
+      return self.cacheResult.deviceId = COUPONSINC.printcontrol.getDeviceID();
     };
 
 
@@ -303,7 +308,10 @@
         gcprinter.log("isPrinterSupported - false - " + initRequiredMsg);
         return false;
       }
-      return COUPONSINC.printcontrol.isPrinterSupported();
+      if ((self.cacheResult.isPrinterSupported != null)) {
+        return self.cacheResult.isPrinterSupported;
+      }
+      return self.cacheResult.isPrinterSupported = COUPONSINC.printcontrol.isPrinterSupported();
     };
 
 
@@ -355,6 +363,9 @@
         gcprinter.log("getStatus - false - " + initRequiredMsg);
         return false;
       }
+      if ((self.initResult != null) && self.initResult.deviceId < 0) {
+        return self.initResult.status;
+      }
       return COUPONSINC.printcontrol.getStatusCode();
     };
 
@@ -385,12 +396,18 @@
       self = this;
       if (!gcprinter.isReady && (typeof COUPONSINC !== "undefined" && COUPONSINC !== null)) {
         gcprinter.log("init starting");
-        cb = function() {
+        cb = function(e) {
           gcprinter.log("init completed");
           gcprinter.isReady = true;
+          gcprinter.initResult = e;
+          gcprinter.cacheResult = e || {};
+          if (e != null) {
+            gcprinter.cacheResult.isPrinterSupported = e.isPrinterSupported === 0 ? false : true;
+            gcprinter.cacheResult.deviceId = e.deviceId;
+          }
           return gcprinter.emit('initcomplete', this);
         };
-        jQuery.when(COUPONSINC.printcontrol.init(self.key, isSecureSite)).done(cb);
+        jQuery.when(COUPONSINC.printcontrol.init(self.key, isSecureSite)).then(cb, cb);
       }
       return self;
     };
