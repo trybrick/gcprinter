@@ -56,7 +56,7 @@ status - print control status
 ### gcprinter#on('printfail', data)
 data - server response with information on why print failed
 
-Debug to console: https://gsn.github.com/gcprinter/example
-Debug to page: https://gsn.github.com/gcprinter/example?debug
+Debug to page: https://gsn.github.io/gcprinter/example?debug
+Debug to console: https://gsn.github.io/gcprinter/example
 
 That is all!
