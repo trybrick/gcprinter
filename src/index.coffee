@@ -15,6 +15,7 @@ class gciprinter
   key: 'new'
   api: 'https://clientapi.gsn2.com/api/v1/ShoppingList/CouponPrint'
   isReady: false
+  hasInit: false
   debug: debug
   isWindows: navigator.platform.indexOf('Win') > -1
   isMac: navigator.platform.indexOf('Mac') > -1
@@ -42,10 +43,6 @@ class gciprinter
       url: "#{sc}#{scExtension}"
       dataType: 'script'
       contentType: 'application/json'
-      success: ->
-        setTimeout ->
-          gcprinter.init()
-        , 100
 
   ###*
    * Log a message
@@ -65,6 +62,7 @@ class gciprinter
   ###
   print: (siteId, coupons) ->
     self = @
+    self.init()
     if !self.isReady
       gcprinter.log "print - false - #{initRequiredMsg}"
       return false
@@ -106,6 +104,10 @@ class gciprinter
   ###
   printWithToken: (printToken, rsp) ->
     self = @
+    self.init()
+    if !self.isReady
+      gcprinter.log "printWithToken - false - #{initRequiredMsg}"
+      return false
     # should have already init the printer
     COUPONSINC.printcontrol.printCoupons printToken, (e)->
       gcprinter.log "printed #{e}"
@@ -124,6 +126,10 @@ class gciprinter
   ###
   checkInstall: (fnSuccess, fnFail) ->
     self = @
+    self.init()
+    if !self.isReady
+      gcprinter.log "checkInstall - false - #{initRequiredMsg}"
+      return false
     fn = COUPONSINC.printcontrol.installCheck(self.key)
     jQuery.when(fn).then fnSuccess, fnFail
     @  
@@ -134,6 +140,7 @@ class gciprinter
   ###
   hasPlugin: () ->
     self = @
+    self.init()
     if !self.isReady
       gcprinter.log "hasPlugin - false - #{initRequiredMsg}"
       return false
@@ -145,6 +152,7 @@ class gciprinter
   ###
   getDeviceId: () ->
     self = @
+    self.init()
     if !self.isReady
       gcprinter.log "getDeviceId - 0 - #{initRequiredMsg}"
       return 0
@@ -160,6 +168,7 @@ class gciprinter
   ###
   isPrinterSupported: () ->
     self = @
+    self.init()
     if !self.isReady
       gcprinter.log "isPrinterSupported - false - #{initRequiredMsg}"
       return false
@@ -175,6 +184,7 @@ class gciprinter
   ###
   isPluginBlocked: () ->
     self = @
+    self.init()
     if !self.isReady
       gcprinter.log "isPluginBlocked - false - #{initRequiredMsg}"
       return false
@@ -189,6 +199,7 @@ class gciprinter
   ###
   isWebSocket: () ->
     self = @
+    self.init()
     if !self.isReady
       gcprinter.log "isWebSocket - false - #{initRequiredMsg}"
       return false
@@ -200,6 +211,7 @@ class gciprinter
   ###
   getStatus: () ->
     self = @
+    self.init()
     if !self.isReady
       gcprinter.log "getStatus - false - #{initRequiredMsg}"
       return false
@@ -228,6 +240,8 @@ class gciprinter
   init: () ->
     self = @
     if !gcprinter.isReady and COUPONSINC?
+      if (self.hasInit) then return self
+      self.hasInit = true
       gcprinter.log "init starting"
       cb = (e) ->
         gcprinter.log "init completed"
@@ -251,7 +265,6 @@ else
 
 jQuery(document).ready ->
   isDocReady = true
-  gcprinter.init()
 
 win.gcprinter = gcprinter
 module.exports = gcprinter

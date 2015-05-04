@@ -4,62 +4,61 @@
 <!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
 <!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
 <head>
-	<meta charset="utf-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>gcprinter demo</title>
-	<meta name="description" content="">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-	<script src="../gcprinter.js"></script>
-	
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>gcprinter demo</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script src="../gcprinter.js"></script>
+
 </head>
 <body>
- <ul id="log">
-  <li>Please view plugin data with javascript console.</li>
-</ul>
-<script>
- if (location.search == "?debug") {
-  $('#log').html("");
-  if (typeof console != "undefined") 
-    if (typeof console.log != 'undefined')
-      console.olog = console.log;
-    else
-      console.olog = function() {};
+  <ul id="log">
+    <li>Please view plugin data with javascript console.</li>
+  </ul>
+  <script>
+    if (location.search == "?debug") {
+      $('#log').html("");
+      if (typeof console != "undefined")
+        if (typeof console.log != 'undefined')
+          console.olog = console.log;
+        else
+          console.olog = function() {};
 
-    console.log = function(message) {
-      console.olog(message);
-      msg = message.replace(/%c/gi, '');
-      $('#log').append('<li>' + msg + '</li>');
-    };
-    console.error = console.debug = console.info =  console.log
-  }
-</script>
-<script>
- gcprinter.debug.enable('*');
-	  // gcprinter.debug.useColors = false
-	  gcprinter.log('starting hasPlugin: ' + gcprinter.hasPlugin());
-	  gcprinter.log('starting getDeviceId: ' + gcprinter.getDeviceId());
-	  gcprinter.log('starting isPrinterSupported: ' + gcprinter.isPrinterSupported());
-	  gcprinter.log('starting getStatus: ' + gcprinter.getStatus());
-	  gcprinter.log('starting isWebSocket: ' + gcprinter.isWebSocket());
-	  gcprinter.log('starting isPluginBlocked: ' + gcprinter.isPluginBlocked());
-	  gcprinter.log('starting getDownload: ' + gcprinter.getDownload());
-	  gcprinter.on('initcomplete', function(){
-	  	gcprinter.log('================================================= Ready =================================================');
-      gcprinter.log('exec hasPlugin: ' + gcprinter.hasPlugin());
-      gcprinter.log('exec getDeviceId: ' + gcprinter.getDeviceId());
-      gcprinter.log('exec isPrinterSupported: ' + gcprinter.isPrinterSupported());
-      gcprinter.log('exec getStatus: ' + gcprinter.getStatus());
-      gcprinter.log('exec isWebSocket: ' + gcprinter.isWebSocket());
-      gcprinter.log('exec isPluginBlocked: ' + gcprinter.isPluginBlocked());
-	    // uncomment to test with real coupon
-	    // gcprinter.print(218, [18814396,18814173]);
-	    //gcprinter.printWithToken('BQPIuxBKKC21218113010')
-      gcprinter.on('printed', function(){
-       gcprinter.log('exec getStatus: ' + gcprinter.getStatus());
-     });
-    });
+        console.log = function(message) {
+          console.olog(message);
+          msg = message.replace(/%c/gi, '');
+          $('#log').append('<li>' + msg + '</li>');
+        };
+        console.error = console.debug = console.info =  console.log
+      }
+    </script>
+    <script>
+    gcprinter.debug.enable('*');
+    setTimeout(function() {
+      gcprinter.init();
+      gcprinter.log('starting hasPlugin: ' + gcprinter.hasPlugin());
+      gcprinter.log('starting getDeviceId: ' + gcprinter.getDeviceId());
+      gcprinter.log('starting isPrinterSupported: ' + gcprinter.isPrinterSupported());
+      gcprinter.log('starting getStatus: ' + gcprinter.getStatus());
+      gcprinter.log('starting isWebSocket: ' + gcprinter.isWebSocket());
+      gcprinter.log('starting isPluginBlocked: ' + gcprinter.isPluginBlocked());
+      gcprinter.log('starting getDownload: ' + gcprinter.getDownload());
+      gcprinter.on('initcomplete', function(){
+        gcprinter.log('================================================= Ready =================================================');
+        gcprinter.log('exec hasPlugin: ' + gcprinter.hasPlugin());
+        gcprinter.log('exec getDeviceId: ' + gcprinter.getDeviceId());
+        gcprinter.log('exec isPrinterSupported: ' + gcprinter.isPrinterSupported());
+        gcprinter.log('exec getStatus: ' + gcprinter.getStatus());
+        gcprinter.log('exec isWebSocket: ' + gcprinter.isWebSocket());
+        gcprinter.log('exec isPluginBlocked: ' + gcprinter.isPluginBlocked());
 
-  </script>
+        gcprinter.on('printed', function(){
+          gcprinter.log('exec getStatus: ' + gcprinter.getStatus());
+        });
+      });
+     }, 1000);
+    </script>
 </body>
 </html>

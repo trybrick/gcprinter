@@ -116,6 +116,8 @@
 
     gciprinter.prototype.isReady = false;
 
+    gciprinter.prototype.hasInit = false;
+
     gciprinter.prototype.debug = debug;
 
     gciprinter.prototype.isWindows = navigator.platform.indexOf('Win') > -1;
@@ -148,12 +150,7 @@
         type: 'GET',
         url: "" + sc + scExtension,
         dataType: 'script',
-        contentType: 'application/json',
-        success: function() {
-          return setTimeout(function() {
-            return gcprinter.init();
-          }, 100);
-        }
+        contentType: 'application/json'
       });
     }
 
@@ -182,6 +179,7 @@
     gciprinter.prototype.print = function(siteId, coupons) {
       var deviceId, payload, self;
       self = this;
+      self.init();
       if (!self.isReady) {
         gcprinter.log("print - false - " + initRequiredMsg);
         return false;
@@ -233,6 +231,11 @@
     gciprinter.prototype.printWithToken = function(printToken, rsp) {
       var self;
       self = this;
+      self.init();
+      if (!self.isReady) {
+        gcprinter.log("printWithToken - false - " + initRequiredMsg);
+        return false;
+      }
       COUPONSINC.printcontrol.printCoupons(printToken, function(e) {
         gcprinter.log("printed " + e);
         if (e === 'blocked') {
@@ -255,6 +258,11 @@
     gciprinter.prototype.checkInstall = function(fnSuccess, fnFail) {
       var fn, self;
       self = this;
+      self.init();
+      if (!self.isReady) {
+        gcprinter.log("checkInstall - false - " + initRequiredMsg);
+        return false;
+      }
       fn = COUPONSINC.printcontrol.installCheck(self.key);
       jQuery.when(fn).then(fnSuccess, fnFail);
       return this;
@@ -269,6 +277,7 @@
     gciprinter.prototype.hasPlugin = function() {
       var self;
       self = this;
+      self.init();
       if (!self.isReady) {
         gcprinter.log("hasPlugin - false - " + initRequiredMsg);
         return false;
@@ -285,6 +294,7 @@
     gciprinter.prototype.getDeviceId = function() {
       var self;
       self = this;
+      self.init();
       if (!self.isReady) {
         gcprinter.log("getDeviceId - 0 - " + initRequiredMsg);
         return 0;
@@ -304,6 +314,7 @@
     gciprinter.prototype.isPrinterSupported = function() {
       var self;
       self = this;
+      self.init();
       if (!self.isReady) {
         gcprinter.log("isPrinterSupported - false - " + initRequiredMsg);
         return false;
@@ -323,6 +334,7 @@
     gciprinter.prototype.isPluginBlocked = function() {
       var result, self;
       self = this;
+      self.init();
       if (!self.isReady) {
         gcprinter.log("isPluginBlocked - false - " + initRequiredMsg);
         return false;
@@ -343,6 +355,7 @@
     gciprinter.prototype.isWebSocket = function() {
       var self;
       self = this;
+      self.init();
       if (!self.isReady) {
         gcprinter.log("isWebSocket - false - " + initRequiredMsg);
         return false;
@@ -359,6 +372,7 @@
     gciprinter.prototype.getStatus = function() {
       var self;
       self = this;
+      self.init();
       if (!self.isReady) {
         gcprinter.log("getStatus - false - " + initRequiredMsg);
         return false;
@@ -395,6 +409,10 @@
       var cb, self;
       self = this;
       if (!gcprinter.isReady && (typeof COUPONSINC !== "undefined" && COUPONSINC !== null)) {
+        if (self.hasInit) {
+          return self;
+        }
+        self.hasInit = true;
         gcprinter.log("init starting");
         cb = function(e) {
           gcprinter.log("init completed");
@@ -425,8 +443,7 @@
   }
 
   jQuery(document).ready(function() {
-    isDocReady = true;
-    return gcprinter.init();
+    return isDocReady = true;
   });
 
   win.gcprinter = gcprinter;
