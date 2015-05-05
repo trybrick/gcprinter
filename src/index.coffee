@@ -16,6 +16,7 @@ class gciprinter
   api: 'https://clientapi.gsn2.com/api/v1/ShoppingList/CouponPrint'
   isReady: false
   hasInit: false
+  cacheResult: {}
   debug: debug
   isWindows: navigator.platform.indexOf('Win') > -1
   isMac: navigator.platform.indexOf('Mac') > -1
@@ -130,8 +131,21 @@ class gciprinter
     if !self.isReady
       gcprinter.log "checkInstall - false - #{initRequiredMsg}"
       return false
-    fn = COUPONSINC.printcontrol.installCheck(self.key)
-    jQuery.when(fn).then fnSuccess, fnFail
+
+    cb = (e) ->
+      if e?
+        jQuery.extend(self.cacheResult, e)
+        self.cacheResult.isPrinterSupported = if e.isPrinterSupported is 0 then false else true
+        if e.deviceId > 0
+          if fnSuccess? 
+            fnSuccess(e)
+        else if (fnFail) 
+          fnFail(e)
+      else if (fnFail)
+        fnFail()
+
+    type = if self.isWebSocket() then 'new' else 'old'
+    COUPONSINC.printcontrol.installCheck(type, cb)
     @  
 
   ###*
@@ -238,22 +252,21 @@ class gciprinter
    * @return {Object}
   ###
   init: () ->
-    self = @
-    if !gcprinter.isReady and COUPONSINC?
+    self = gcprinter
+    if !self.isReady and COUPONSINC?
       if (self.hasInit) then return self
       self.hasInit = true
-      gcprinter.log "init starting"
+      self.log "init starting"
       cb = (e) ->
-        gcprinter.log "init completed"
-        gcprinter.isReady = true
-        gcprinter.initResult = e
-        gcprinter.cacheResult = e or {}
-
+        self.log "init completed"
+        self.isReady = true
+        self.initResult = e
+  
         if e?
-          gcprinter.cacheResult.isPrinterSupported = if e.isPrinterSupported is 0 then false else true
-          gcprinter.cacheResult.deviceId = e.deviceId
-
-        gcprinter.emit('initcomplete', @)
+          jQuery.extend(self.cacheResult, e)
+          self.cacheResult.isPrinterSupported = if e.isPrinterSupported is 0 then false else true
+  
+        self.emit('initcomplete', self)
       jQuery.when(COUPONSINC.printcontrol.init(self.key, isSecureSite)).then cb, cb
     return self
 

@@ -37,14 +37,6 @@
     <script>
     gcprinter.debug.enable('*');
     setTimeout(function() {
-      gcprinter.init();
-      gcprinter.log('starting hasPlugin: ' + gcprinter.hasPlugin());
-      gcprinter.log('starting getDeviceId: ' + gcprinter.getDeviceId());
-      gcprinter.log('starting isPrinterSupported: ' + gcprinter.isPrinterSupported());
-      gcprinter.log('starting getStatus: ' + gcprinter.getStatus());
-      gcprinter.log('starting isWebSocket: ' + gcprinter.isWebSocket());
-      gcprinter.log('starting isPluginBlocked: ' + gcprinter.isPluginBlocked());
-      gcprinter.log('starting getDownload: ' + gcprinter.getDownload());
       gcprinter.on('initcomplete', function(){
         gcprinter.log('================================================= Ready =================================================');
         gcprinter.log('exec hasPlugin: ' + gcprinter.hasPlugin());
@@ -53,11 +45,25 @@
         gcprinter.log('exec getStatus: ' + gcprinter.getStatus());
         gcprinter.log('exec isWebSocket: ' + gcprinter.isWebSocket());
         gcprinter.log('exec isPluginBlocked: ' + gcprinter.isPluginBlocked());
+        gcprinter.checkInstall(function() {
+          console.log('exec checkInstall success');
+        }, function() {
+          console.log('exec checkInstall fail');
+        });
 
         gcprinter.on('printed', function(){
           gcprinter.log('exec getStatus: ' + gcprinter.getStatus());
         });
       });
+
+      gcprinter.init();
+      gcprinter.log('starting hasPlugin: ' + gcprinter.hasPlugin());
+      gcprinter.log('starting getDeviceId: ' + gcprinter.getDeviceId());
+      gcprinter.log('starting isPrinterSupported: ' + gcprinter.isPrinterSupported());
+      gcprinter.log('starting getStatus: ' + gcprinter.getStatus());
+      gcprinter.log('starting isWebSocket: ' + gcprinter.isWebSocket());
+      gcprinter.log('starting isPluginBlocked: ' + gcprinter.isPluginBlocked());
+      gcprinter.log('starting getDownload: ' + gcprinter.getDownload());
      }, 1000);
     </script>
 </body>
