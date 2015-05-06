@@ -18,7 +18,16 @@
     <li>Please view plugin data with javascript console.</li>
   </ul>
   <script>
-    if (location.search == "?debug") {
+    var coupons = [];
+    var isDebug = location.search == "?debug";
+    if (location.search.indexOf("?coupons=") == 0)
+    {
+      search = location.search.replace("?coupons=", "");
+      coupons = search.split(',');
+      isDebug = true;
+    }
+
+    if (isDebug) {
       $('#log').html("");
       if (typeof console != "undefined")
         if (typeof console.log != 'undefined')
@@ -26,14 +35,15 @@
         else
           console.olog = function() {};
 
-        console.log = function(message) {
-          console.olog(message);
-          msg = message.replace(/%c/gi, '');
-          $('#log').append('<li>' + msg + '</li>');
-        };
-        console.error = console.debug = console.info =  console.log
-      }
-    </script>
+      console.log = function(message) {
+        console.olog(message);
+        msg = message.replace(/%c/gi, '');
+        $('#log').append('<li>' + msg + '</li>');
+      };
+      console.error = console.debug = console.info =  console.log
+    }
+
+  </script>
     <script>
     gcprinter.debug.enable('*');
     setTimeout(function() {
@@ -54,6 +64,10 @@
         gcprinter.on('printed', function(){
           gcprinter.log('exec getStatus: ' + gcprinter.getStatus());
         });
+
+        if (coupons.length > 0) {
+          gcprinter.print(127, coupons);
+        }
       });
 
       gcprinter.init();
