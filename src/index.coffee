@@ -217,7 +217,7 @@ class gciprinter
     if !self.isReady
       gcprinter.log "isWebSocket - false - #{initRequiredMsg}"
       return false
-    return COUPONSINC.printcontrol.getManager() is'socket'
+    return COUPONSINC.printcontrol.getManager().getSocket?
 
   ###*
    * get the current status code
