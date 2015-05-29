@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>gcprinter demo</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script src="../gcprinter.js"></script>
+</head>
+<body>
+  <h1> How do I install the Coupon Printer?</h1>
+  <div id="mac" style="display: none">
+  	<ol>
+                <li><a class="link1" href="http://cdn.coupons.com/ftp.coupons.com/partners/couponprinter.exe">Click here
+                    </a> to download the Coupon Printer installer</li>
+                <li>Click "Run" to start the installation process in Internet Explorer. Click "Save"
+                    in Firefox, then run the install file once the download completes</li>
+                <li>Read and agree to the license agreement to begin installing the Coupon Printer</li>
+                <li>Once you see "Installation Successful", your coupons will be sent directly to your
+                    system's default printer</li></ol>
+
+  </div>
+  <div id="pc" style="display:none">
+  	
+  	<ol>
+                <li><a class="link1" href="http://cdn.coupons.com/ftp.coupons.com/safari/MacCouponPrinterWS.dmg">Click here</a> to download the Coupon Printer</li>
+                <li>Click "Continue" to start the installation process</li>
+                <li>Read and agree to the license agreement to begin installing the Coupon Printer</li>
+                <li>Select a destination to install the Coupon Printer and click "Continue" to proceed</li>
+                <li>Click "Install" to begin the installation</li>
+                <li>Once you see "Installation Successful", your coupons will be sent directly to your
+                    system's default printer</li>
+            </ol>
+  </div>
+  <ul id="log"></ul>
+  <script>
+    function writelog(message) {
+      msg = message.replace(/%c/gi, '');
+      $('#log').append('<li>' + msg + '</li>');
+    };
+    gcprinter.debug.enable('*');
+    if (gcprinter.isWindows) {
+    	$("#pc").show();
+    }
+    else {
+    	$("#mac").show();
+    }
+    $('.link1').attr('href', gcprinter.getDownload()).html(gcprinter.getDownload());
+
+    setTimeout(function() {
+    gcprinter.on('initcomplete', function(){
+        writelog('================================================= Printer Ready =================================================');
+        writelog('is Printer Installed: ' + gcprinter.hasPlugin());
+        writelog('is Printer Supported (default printer is not XPS, PDF, etc..): ' + gcprinter.isPrinterSupported());
+        writelog('is Printer Blocked: ' + gcprinter.isPluginBlocked());
+        gcprinter.printWithToken('BQPIuxBKKC21218113010', {});
+    });
+
+    gcprinter.on('printed', function() {
+    	writelog('Test: SUCCESS!');
+    });
+
+    gcprinter.on('printfail', function() {
+    	writelog('Test: FAILED!');
+    });
+
+    gcprinter.init();
+    }, 1000);
+  </script>
+</body>
+</html>
