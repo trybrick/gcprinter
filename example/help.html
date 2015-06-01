@@ -11,33 +11,116 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
   <script src="../gcprinter.js"></script>
+  <style>.hidden { display: none;}</style>
 </head>
 <body>
   <h1> How do I install the Coupon Printer?</h1>
-  <div id="mac" style="display: none">
-  	<ol>
-                <li><a class="link1" href="http://cdn.coupons.com/ftp.coupons.com/partners/couponprinter.exe">Click here
-                    </a> to download the Coupon Printer installer</li>
-                <li>Click "Run" to start the installation process in Internet Explorer. Click "Save"
-                    in Firefox, then run the install file once the download completes</li>
-                <li>Read and agree to the license agreement to begin installing the Coupon Printer</li>
-                <li>Once you see "Installation Successful", your coupons will be sent directly to your
-                    system's default printer</li></ol>
+  <div style="text-align: left">
+    <div id="mac" class="hidden">
+    	<ol>
+                  <li><a class="link1" href="http://cdn.coupons.com/ftp.coupons.com/partners/couponprinter.exe">Click here
+                      </a> to download the Coupon Printer installer</li>
+                  <li>Click "Run" to start the installation process in Internet Explorer. Click "Save"
+                      in Firefox, then run the install file once the download completes</li>
+                  <li>Read and agree to the license agreement to begin installing the Coupon Printer</li>
+                  <li>Once you see "Installation Successful", your coupons will be sent directly to your
+                      system's default printer</li></ol>
 
+    </div>
+    <div id="win" class="hidden">
+    	<ol>
+        <li><a class="link1" href="http://cdn.coupons.com/ftp.coupons.com/safari/MacCouponPrinterWS.dmg">Click here</a> to download the Coupon Printer</li>
+        <li>Click "Continue" to start the installation process</li>
+        <li>Read and agree to the license agreement to begin installing the Coupon Printer</li>
+        <li>Select a destination to install the Coupon Printer and click "Continue" to proceed</li>
+        <li>Click "Install" to begin the installation</li>
+        <li>Once you see "Installation Successful", your coupons will be sent directly to your
+            system's default printer</li>
+      </ol>
+    </div>
   </div>
-  <div id="pc" style="display:none">
-  	
-  	<ol>
-                <li><a class="link1" href="http://cdn.coupons.com/ftp.coupons.com/safari/MacCouponPrinterWS.dmg">Click here</a> to download the Coupon Printer</li>
-                <li>Click "Continue" to start the installation process</li>
-                <li>Read and agree to the license agreement to begin installing the Coupon Printer</li>
-                <li>Select a destination to install the Coupon Printer and click "Continue" to proceed</li>
-                <li>Click "Install" to begin the installation</li>
-                <li>Once you see "Installation Successful", your coupons will be sent directly to your
-                    system's default printer</li>
-            </ol>
-  </div>
+  <h1>Detecting Coupon Printer, please wait...</h1>
   <ul id="log"></ul>
+  <h1>Coupon Printer already installed?</h1>
+  <a href="javascript:void(0)" class="removeHow">How do I remove the Coupon Printer?</a>
+  <div style="text-align: center">
+    <div id="wintext" class="hidden">
+        <div class="bar">
+            <b>&nbsp;Windows Removal Instructions</b><br>
+        </div>
+        <br>
+        <p align="left">
+            <b>Step 1:</b><br>
+            Click the "Start" menu button and select "All Programs"</p>
+        <p align="center">
+            <img width="602" height="423" alt="" src="http://cdn.coupons.com/www.couponsinc.com/corp/images/u_uninstall/winu1.jpg">
+        </p>
+        <p>
+            <b>Step 2:</b><br>
+            Click the "Coupons" program folder and select "Uninstall Coupon Printer for Windows"
+        </p>
+        <br />
+        <p align="center">
+            <img width="602" height="423" alt="" src="http://cdn.coupons.com/www.couponsinc.com/corp/images/u_uninstall/winu2.jpg">
+        </p>
+        <p>
+            This will initiate the Coupon Printer uninstaller:<br>
+        </p>
+        <p align="center">
+            <img width="4px" alt="" src="http://cdn.coupons.com/www.couponsinc.com/corp/images/global/dot.gif">
+            <img width="513" height="400" alt="" src="http://cdn.coupons.com/www.couponsinc.com/corp/images/u_uninstall/winu3.jpg">
+        </p>
+        <p>
+        </p>
+        <div style="clear: both; height: 0px;">
+        </div>
+        <p>
+            The Coupon Printer will now uninstall itself, which may take a moment or two.</p>
+        <p>
+            You should then see the following screen:<br>
+        </p>
+        <p align="center">
+            <img width="4px" alt="" src="http://cdn.coupons.com/www.couponsinc.com/corp/images/global/dot.gif">
+            <img width="513" height="400" alt="" src="http://cdn.coupons.com/www.couponsinc.com/corp/images/u_uninstall/winu4.jpg"></p>
+        <p>
+            <b>Step 3:</b><br>
+            Click "Finish" and you are done!
+        </p>
+        <br>
+    </div>
+    <div id="mactext" class="hidden">
+        <div class="bar">
+            <b>&nbsp;Mac OS X Removal Instructions</b><br>
+        </div>
+        <br>
+        <p>
+            <b>Step 1:</b><br>
+            Click on the 'Finder' icon to open the Finder window.</p>
+        <p align="center">
+            <img width="602" height="126" alt="" src="http://cdn.coupons.com/www.couponsinc.com/corp/images/u_uninstall/macu1.jpg"></p>
+        <p>
+            <b>Step 2:</b><br>
+            Select your Macintosh local hard drive from the Finder window to display the drive's
+            contents.</p>
+        <p>
+            <b>Step 3:</b><br>
+            Locate and open the 'Applications' folder.</p>
+        <p align="center">
+            <img width="602" height="423" alt="" src="http://cdn.coupons.com/www.couponsinc.com/corp/images/u_uninstall/macu2.jpg"></p>
+        <p>
+            <b>Step 4:</b><br>
+            Locate and open the 'Coupons' folder from within Applications.</p>
+        <p align="center">
+            <img width="602" height="423" alt="" src="http://cdn.coupons.com/www.couponsinc.com/corp/images/u_uninstall/macu3.jpg"></p>
+        <p>
+            <b>Step 5:</b><br>
+            Run the 'Uninstall Coupon Printing Software' file to initiate the uninstaller.</p>
+        <p align="center">
+            <img width="602" height="423" alt="" src="http://cdn.coupons.com/www.couponsinc.com/corp/images/u_uninstall/macu4.jpg">
+        </p>
+        <br>
+    </div>
+  </div>
   <script>
     function writelog(message) {
       msg = message.replace(/%c/gi, '');
@@ -45,12 +128,21 @@
     };
     gcprinter.debug.enable('*');
     if (gcprinter.isWindows) {
-    	$("#pc").show();
+    	$("#win").toggleClass('hidden');
     }
     else {
-    	$("#mac").show();
+    	$("#mac").toggleClass('hidden');
     }
     $('.link1').attr('href', gcprinter.getDownload()).html(gcprinter.getDownload());
+    $('.removeHow').click(function() {
+
+      if (gcprinter.isWindows) {
+        $("#wintext").toggleClass('hidden');
+      }
+      else {
+        $("#mactext").toggleClass('hidden');
+      }
+    });
 
     setTimeout(function() {
     gcprinter.on('initcomplete', function(){
@@ -72,5 +164,7 @@
     gcprinter.init();
     }, 1000);
   </script>
+
+
 </body>
 </html>
