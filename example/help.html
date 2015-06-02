@@ -154,7 +154,13 @@
     });
 
     gcprinter.on('printed', function() {
-    	writelog('Test: SUCCESS!');
+      if (gcprinter.hasPlugin() && gcprinter.isPrinterSupported() && !gcprinter.isPluginBlocked())
+      {
+    	  writelog('Test: SUCCESS!');
+      }
+      else {
+        writelog('Test; FAILED!')
+      }
     });
 
     gcprinter.on('printfail', function() {

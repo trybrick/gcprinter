@@ -144,7 +144,7 @@ class gciprinter
       else if (fnFail)
         fnFail()
 
-    type = if self.isWebSocket() then 'new' else 'old'
+    type = if self.isChrome then 'new' else 'old'
     COUPONSINC.printcontrol.installCheck(type, cb)
     @  
 

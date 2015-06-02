@@ -280,7 +280,7 @@
           return fnFail();
         }
       };
-      type = self.isWebSocket() ? 'new' : 'old';
+      type = self.isChrome ? 'new' : 'old';
       COUPONSINC.printcontrol.installCheck(type, cb);
       return this;
     };
