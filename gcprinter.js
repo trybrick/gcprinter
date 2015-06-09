@@ -299,6 +299,22 @@
         gcprinter.log("hasPlugin - false - " + initRequiredMsg);
         return false;
       }
+      return COUPONSINC.printcontrol.isPrintControlInstalled();
+    };
+
+
+    /**
+     *
+     */
+
+    gciprinter.prototype.getUpdateSupported = function() {
+      var self;
+      self = this;
+      self.init();
+      if (!self.isReady) {
+        gcprinter.log("getUpdateSupported - false - " + initRequiredMsg);
+        return false;
+      }
       return COUPONSINC.printcontrol.getUpdateSupported();
     };
 
