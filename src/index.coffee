@@ -158,7 +158,7 @@ class gciprinter
     if !self.isReady
       gcprinter.log "hasPlugin - false - #{initRequiredMsg}"
       return false
-    return COUPONSINC.printcontrol.isPrintControlInstalled()
+    return COUPONSINC.printcontrol.getUpdateSupported()
 
   ###*
    * get the plugin device id
