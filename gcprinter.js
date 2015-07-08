@@ -443,28 +443,33 @@
      */
 
     gciprinter.prototype.detectWithSocket = function(timeout, cbSuccess, cbFailure, retries) {
-      var self, socket;
+      var exception, self, socket;
       self = this;
       self.retries = retries || 999;
-      socket = new WebSocket('ws://localhost:26876');
       self.log("self check socket");
-      socket.onopen = function() {
-        self.log("self check socket success");
-        socket.close();
-        return cbSuccess();
-      };
-      socket.onerror = function(error) {
-        self.log("self check socket failed, retries remain " + retries);
-        socket.close();
-        win.setTimeout(function() {
-          if (self.retries < 0) {
-            cbFailure();
-            return self;
-          }
-          return self.detectWithSocket(timeout, cbSuccess, cbFailure, self.retries - 1, timeout);
-        });
-        return self;
-      };
+      try {
+        socket = new WebSocket('ws://localhost:26876');
+        socket.onopen = function() {
+          self.log("self check socket success");
+          socket.close();
+          return cbSuccess();
+        };
+        socket.onerror = function(error) {
+          self.log("self check socket failed, retries remain " + retries);
+          socket.close();
+          win.setTimeout(function() {
+            if (self.retries < 1) {
+              cbFailure();
+              return self;
+            }
+            return self.detectWithSocket(timeout, cbSuccess, cbFailure, self.retries - 1, timeout);
+          });
+          return self;
+        };
+      } catch (_error) {
+        exception = _error;
+        cbFailure();
+      }
       return self;
     };
 
@@ -504,7 +509,7 @@
           return jQuery.when(COUPONSINC.printcontrol.init(type, isSecureSite)).then(cb, cb);
         };
         if (type === 'new') {
-          self.detectWithSocket(300, myCb, myCb, 10);
+          self.detectWithSocket(5, myCb, myCb, 10);
         } else {
           myCb();
         }
