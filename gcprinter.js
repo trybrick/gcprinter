@@ -280,7 +280,7 @@
           return fnFail();
         }
       };
-      type = self.isChrome ? 'new' : 'old';
+      type = self.key || (self.isChrome ? 'new' : 'old');
       COUPONSINC.printcontrol.installCheck(type, cb);
       return this;
     };
@@ -447,8 +447,15 @@
       self = this;
       self.retries = retries || 999;
       socket = new WebSocket('ws://localhost:26876');
-      socket.onopen = cbSuccess;
+      self.log("self check socket");
+      socket.onopen = function() {
+        self.log("self check socket success");
+        socket.close();
+        return cbSuccess();
+      };
       socket.onerror = function(error) {
+        self.log("self check socket failed, retries remain " + retries);
+        socket.close();
         win.setTimeout(function() {
           if (self.retries < 0) {
             cbFailure();
@@ -469,7 +476,7 @@
      */
 
     gciprinter.prototype.init = function(force) {
-      var cb, self, type;
+      var cb, myCb, self, type;
       self = gcprinter;
       if (force) {
         self.isReady = false;
@@ -480,7 +487,8 @@
           return self;
         }
         self.hasInit = true;
-        self.log("init starting");
+        type = self.key || (self.isChrome ? 'new' : 'old');
+        self.log("init starting " + type);
         cb = function(e) {
           self.log("init completed");
           self.isReady = true;
@@ -491,8 +499,15 @@
           }
           return self.emit('initcomplete', self);
         };
-        type = self.isChrome ? 'new' : 'old';
-        jQuery.when(COUPONSINC.printcontrol.init(type, isSecureSite)).then(cb, cb);
+        myCb = function() {
+          self.log("actual plugin init");
+          return jQuery.when(COUPONSINC.printcontrol.init(type, isSecureSite)).then(cb, cb);
+        };
+        if (type === 'new') {
+          self.detectPrinterWithSocket(300, myCb, myCb, 10);
+        } else {
+          myCb();
+        }
       }
       return self;
     };

@@ -144,7 +144,7 @@ class gciprinter
       else if (fnFail)
         fnFail()
 
-    type = if self.isChrome then 'new' else 'old'
+    type = self.key || if self.isChrome then 'new' else 'old'
     COUPONSINC.printcontrol.installCheck(type, cb)
     @
 
@@ -270,8 +270,14 @@ class gciprinter
     self = @
     self.retries = retries || 999
     socket = new WebSocket('ws://localhost:26876')
-    socket.onopen = cbSuccess
+    self.log "self check socket"
+    socket.onopen = () ->
+      self.log "self check socket success"
+      socket.close()
+      cbSuccess()
     socket.onerror = (error) ->
+      self.log "self check socket failed, retries remain #{retries}"
+      socket.close()
       win.setTimeout ->
         if (self.retries < 0)
           cbFailure()
@@ -298,7 +304,8 @@ class gciprinter
     if !self.isReady and COUPONSINC?
       if self.hasInit then return self
       self.hasInit = true
-      self.log "init starting"
+      type = self.key || if self.isChrome then 'new' else 'old'
+      self.log "init starting #{type}"
       cb = (e) ->
         self.log "init completed"
         self.isReady = true
@@ -310,8 +317,17 @@ class gciprinter
 
         self.emit('initcomplete', self)
 
-      type = if self.isChrome then 'new' else 'old'
-      jQuery.when(COUPONSINC.printcontrol.init(type, isSecureSite)).then cb, cb
+
+      myCb = () ->
+        self.log "actual plugin init"
+        jQuery.when(COUPONSINC.printcontrol.init(type, isSecureSite)).then cb, cb
+
+      # do our own socket check first
+      if (type is 'new')
+        self.detectPrinterWithSocket 300, myCb, myCb, 10
+      else
+        myCb()
+      
     return self
 
 Emitter(gciprinter.prototype)
