@@ -285,7 +285,8 @@ class gciprinter
             return self
 
           self.detectWithSocket timeout, cbSuccess, cbFailure, self.retries - 1
-          , timeout
+          return self;
+        , timeout
 
         return self
     catch exception

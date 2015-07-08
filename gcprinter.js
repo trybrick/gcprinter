@@ -462,8 +462,9 @@
               cbFailure();
               return self;
             }
-            return self.detectWithSocket(timeout, cbSuccess, cbFailure, self.retries - 1, timeout);
-          });
+            self.detectWithSocket(timeout, cbSuccess, cbFailure, self.retries - 1);
+            return self;
+          }, timeout);
           return self;
         };
       } catch (_error) {
