@@ -280,7 +280,7 @@ class gciprinter
         self.log "self check socket failed, retries remain #{retries}"
         socket.close()
         win.setTimeout ->
-          if (self.retries < 1)
+          if (self.retries <= 1)
             cbFailure()
             return self
 
@@ -328,7 +328,7 @@ class gciprinter
 
       # do our own socket check first
       if (type is 'new')
-        self.detectWithSocket 5, myCb, myCb, 2
+        self.detectWithSocket 5, myCb, myCb, 1
       else
         myCb()
       

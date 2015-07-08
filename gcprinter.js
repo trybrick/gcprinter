@@ -458,7 +458,7 @@
           self.log("self check socket failed, retries remain " + retries);
           socket.close();
           win.setTimeout(function() {
-            if (self.retries < 1) {
+            if (self.retries <= 1) {
               cbFailure();
               return self;
             }
@@ -510,7 +510,7 @@
           return jQuery.when(COUPONSINC.printcontrol.init(type, isSecureSite)).then(cb, cb);
         };
         if (type === 'new') {
-          self.detectWithSocket(5, myCb, myCb, 2);
+          self.detectWithSocket(5, myCb, myCb, 1);
         } else {
           myCb();
         }
