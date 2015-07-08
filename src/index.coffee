@@ -259,14 +259,14 @@ class gciprinter
     return self.dl.mac
 
   ###*
-   * detect printer with socket
+   * detect plugin with socket
    * @param  {[type]} timeout   [description]
    * @param  {[type]} cbSuccess [description]
    * @param  {[type]} cbFailure [description]
    * @param  {[type]} retries   [description]
    * @return {[type]}           [description]
   ###
-  detectPrinterWithSocket: (timeout, cbSuccess, cbFailure, retries) ->
+  detectWithSocket: (timeout, cbSuccess, cbFailure, retries) ->
     self = @
     self.retries = retries || 999
     socket = new WebSocket('ws://localhost:26876')
@@ -283,7 +283,7 @@ class gciprinter
           cbFailure()
           return self
 
-        self.detectPrinterWithSocket timeout, cbSuccess, cbFailure, self.retries - 1
+        self.detectWithSocket timeout, cbSuccess, cbFailure, self.retries - 1
         , timeout
 
       return self
@@ -324,7 +324,7 @@ class gciprinter
 
       # do our own socket check first
       if (type is 'new')
-        self.detectPrinterWithSocket 300, myCb, myCb, 10
+        self.detectWithSocket 300, myCb, myCb, 10
       else
         myCb()
       

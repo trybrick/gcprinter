@@ -434,7 +434,7 @@
 
 
     /**
-     * detect printer with socket
+     * detect plugin with socket
      * @param  {[type]} timeout   [description]
      * @param  {[type]} cbSuccess [description]
      * @param  {[type]} cbFailure [description]
@@ -442,7 +442,7 @@
      * @return {[type]}           [description]
      */
 
-    gciprinter.prototype.detectPrinterWithSocket = function(timeout, cbSuccess, cbFailure, retries) {
+    gciprinter.prototype.detectWithSocket = function(timeout, cbSuccess, cbFailure, retries) {
       var self, socket;
       self = this;
       self.retries = retries || 999;
@@ -461,7 +461,7 @@
             cbFailure();
             return self;
           }
-          return self.detectPrinterWithSocket(timeout, cbSuccess, cbFailure, self.retries - 1, timeout);
+          return self.detectWithSocket(timeout, cbSuccess, cbFailure, self.retries - 1, timeout);
         });
         return self;
       };
@@ -504,7 +504,7 @@
           return jQuery.when(COUPONSINC.printcontrol.init(type, isSecureSite)).then(cb, cb);
         };
         if (type === 'new') {
-          self.detectPrinterWithSocket(300, myCb, myCb, 10);
+          self.detectWithSocket(300, myCb, myCb, 10);
         } else {
           myCb();
         }
