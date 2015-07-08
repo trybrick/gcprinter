@@ -445,7 +445,7 @@
     gciprinter.prototype.detectWithSocket = function(timeout, cbSuccess, cbFailure, retries) {
       var exception, self, socket;
       self = this;
-      self.retries = retries || 999;
+      self.retries = retries;
       self.log("self check socket");
       try {
         socket = new WebSocket('ws://localhost:26876');
@@ -510,7 +510,7 @@
           return jQuery.when(COUPONSINC.printcontrol.init(type, isSecureSite)).then(cb, cb);
         };
         if (type === 'new') {
-          self.detectWithSocket(5, myCb, myCb, 10);
+          self.detectWithSocket(5, myCb, myCb, 2);
         } else {
           myCb();
         }

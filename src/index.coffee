@@ -268,7 +268,7 @@ class gciprinter
   ###
   detectWithSocket: (timeout, cbSuccess, cbFailure, retries) ->
     self = @
-    self.retries = retries || 999
+    self.retries = retries
     self.log "self check socket"
     try 
       socket = new WebSocket('ws://localhost:26876')
@@ -328,7 +328,7 @@ class gciprinter
 
       # do our own socket check first
       if (type is 'new')
-        self.detectWithSocket 5, myCb, myCb, 10
+        self.detectWithSocket 5, myCb, myCb, 2
       else
         myCb()
       
