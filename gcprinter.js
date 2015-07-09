@@ -352,7 +352,7 @@
         gcprinter.log("isPrinterSupported - false - " + initRequiredMsg);
         return false;
       }
-      if ((self.cacheResult.isPrinterSupported != null)) {
+      if ((self.cacheResult.isPrinterSupported != null) && self.cacheResult.isPrinterSupported === true) {
         return self.cacheResult.isPrinterSupported;
       }
       return self.cacheResult.isPrinterSupported = COUPONSINC.printcontrol.isPrinterSupported();
