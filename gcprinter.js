@@ -332,7 +332,7 @@
         gcprinter.log("getDeviceId - 0 - " + initRequiredMsg);
         return 0;
       }
-      if ((self.cacheResult.deviceId != null) && (self.cacheResult.deviceId > 0)) {
+      if ((self.cacheResult.deviceId != null)) {
         return self.cacheResult.deviceId;
       }
       return self.cacheResult.deviceId = COUPONSINC.printcontrol.getDeviceID();
@@ -352,7 +352,7 @@
         gcprinter.log("isPrinterSupported - false - " + initRequiredMsg);
         return false;
       }
-      if ((self.cacheResult.isPrinterSupported != null) && self.cacheResult.isPrinterSupported) {
+      if ((self.cacheResult.isPrinterSupported != null)) {
         return self.cacheResult.isPrinterSupported;
       }
       return self.cacheResult.isPrinterSupported = COUPONSINC.printcontrol.isPrinterSupported();
@@ -516,14 +516,6 @@
         }
       }
       return self;
-    };
-	
-	/**
-     * Reload COUPONSINC object
-     */
-	
-	gciprinter.prototype.restartPlugin = function() {
-	  COUPONSINC.printcontrol.init(self.key, isSecureSite);
     };
 
     return gciprinter;
