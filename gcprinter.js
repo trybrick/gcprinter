@@ -110,9 +110,9 @@
   gciprinter = (function() {
     gciprinter.prototype.doc = win.document;
 
-    gciprinter.prototype.key = 'new';
-
     gciprinter.prototype.api = 'https://clientapi.gsn2.com/api/v1/ShoppingList/CouponPrint';
+
+    gciprinter.prototype.retries = 0;
 
     gciprinter.prototype.isReady = false;
 
@@ -252,8 +252,8 @@
 
     /**
      * allow callback to check if coupon printer is installed
-     * @param  {Function} fnSuccess 
-     * @param  {Function} fnFail    
+     * @param  {Function} fnSuccess
+     * @param  {Function} fnFail
      * @return {Object}
      */
 
@@ -280,7 +280,7 @@
           return fnFail();
         }
       };
-      type = self.isChrome ? 'new' : 'old';
+      type = self.key || (self.isChrome ? 'new' : 'old');
       COUPONSINC.printcontrol.installCheck(type, cb);
       return this;
     };
@@ -434,19 +434,67 @@
 
 
     /**
+     * detect plugin with socket
+     * @param  {[type]} timeout   [description]
+     * @param  {[type]} cbSuccess [description]
+     * @param  {[type]} cbFailure [description]
+     * @param  {[type]} retries   [description]
+     * @return {[type]}           [description]
+     */
+
+    gciprinter.prototype.detectWithSocket = function(timeout, cbSuccess, cbFailure, retries) {
+      var exception, self, socket;
+      self = this;
+      self.retries = retries;
+      self.log("self check socket");
+      try {
+        socket = new WebSocket('ws://localhost:26876');
+        socket.onopen = function() {
+          self.log("self check socket success");
+          socket.close();
+          return cbSuccess();
+        };
+        socket.onerror = function(error) {
+          self.log("self check socket failed, retries remain " + retries);
+          socket.close();
+          win.setTimeout(function() {
+            if (self.retries <= 1) {
+              cbFailure();
+              return self;
+            }
+            self.detectWithSocket(timeout, cbSuccess, cbFailure, self.retries - 1);
+            return self;
+          }, timeout);
+          return self;
+        };
+      } catch (_error) {
+        exception = _error;
+        cbFailure();
+      }
+      return self;
+    };
+
+
+    /**
      * initialize COUPONSINC object
+     * @param  {Boolean} force to restart init
      * @return {Object}
      */
 
-    gciprinter.prototype.init = function() {
-      var cb, self;
+    gciprinter.prototype.init = function(force) {
+      var cb, myCb, self, type;
       self = gcprinter;
+      if (force) {
+        self.isReady = false;
+        self.hasInit = false;
+      }
       if (!self.isReady && (typeof COUPONSINC !== "undefined" && COUPONSINC !== null)) {
         if (self.hasInit) {
           return self;
         }
         self.hasInit = true;
-        self.log("init starting");
+        type = self.key || (self.isChrome ? 'new' : 'old');
+        self.log("init starting " + type);
         cb = function(e) {
           self.log("init completed");
           self.isReady = true;
@@ -457,7 +505,15 @@
           }
           return self.emit('initcomplete', self);
         };
-        jQuery.when(COUPONSINC.printcontrol.init(self.key, isSecureSite)).then(cb, cb);
+        myCb = function() {
+          self.log("actual plugin init");
+          return jQuery.when(COUPONSINC.printcontrol.init(type, isSecureSite)).then(cb, cb);
+        };
+        if (type === 'new') {
+          self.detectWithSocket(5, myCb, myCb, 1);
+        } else {
+          myCb();
+        }
       }
       return self;
     };

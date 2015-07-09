@@ -12,8 +12,8 @@ initRequiredMsg = 'because plugin has not been initialized'
 ###
 class gciprinter
   doc: win.document
-  key: 'new'
   api: 'https://clientapi.gsn2.com/api/v1/ShoppingList/CouponPrint'
+  retries: 0
   isReady: false
   hasInit: false
   cacheResult: {}
@@ -21,7 +21,7 @@ class gciprinter
   isWindows: navigator.platform.indexOf('Win') > -1
   isMac: navigator.platform.indexOf('Mac') > -1
   isChrome: /chrome/i.test(navigator.userAgent)
-  dl: 
+  dl:
     win: "http://cdn.coupons.com/ftp.coupons.com/partners/CouponPrinter.exe"
     mac: "http://cdn.coupons.com/ftp.coupons.com/safari/MacCouponPrinterWS.dmg"
 
@@ -48,7 +48,7 @@ class gciprinter
   ###*
    * Log a message
    * @param  {string} msg message
-   * @return {Object}    
+   * @return {Object}
   ###
   log: (msg) ->
     self = @
@@ -59,7 +59,7 @@ class gciprinter
    * print coupon provided site or chainid and coupons array
    * @param  {Number} siteId  Site or Chain Id
    * @param  {Array}  coupons array of manufacturer coupon codes
-   * @return {Object} 
+   * @return {Object}
   ###
   print: (siteId, coupons) ->
     self = @
@@ -101,7 +101,7 @@ class gciprinter
    * print coupon provided a token
    * @param  {string} printToken token
    * @param  {Object} rsp        server side response object
-   * @return {Object}           
+   * @return {Object}
   ###
   printWithToken: (printToken, rsp) ->
     self = @
@@ -121,9 +121,9 @@ class gciprinter
 
   ###*
    * allow callback to check if coupon printer is installed
-   * @param  {Function} fnSuccess 
-   * @param  {Function} fnFail    
-   * @return {Object}          
+   * @param  {Function} fnSuccess
+   * @param  {Function} fnFail
+   * @return {Object}
   ###
   checkInstall: (fnSuccess, fnFail) ->
     self = @
@@ -137,16 +137,16 @@ class gciprinter
         jQuery.extend(self.cacheResult, e)
         self.cacheResult.isPrinterSupported = if e.isPrinterSupported is 0 then false else true
         if e.deviceId > 0
-          if fnSuccess? 
+          if fnSuccess?
             fnSuccess(e)
-        else if (fnFail) 
+        else if (fnFail)
           fnFail(e)
       else if (fnFail)
         fnFail()
 
-    type = if self.isChrome then 'new' else 'old'
+    type = self.key || if self.isChrome then 'new' else 'old'
     COUPONSINC.printcontrol.installCheck(type, cb)
-    @  
+    @
 
   ###*
    * determine if plugin is installed
@@ -161,7 +161,7 @@ class gciprinter
     return COUPONSINC.printcontrol.isPrintControlInstalled()
 
   ###*
-   * 
+   *
   ###
   getUpdateSupported: () ->
     self = @
@@ -170,7 +170,7 @@ class gciprinter
       gcprinter.log "getUpdateSupported - false - #{initRequiredMsg}"
       return false
     return COUPONSINC.printcontrol.getUpdateSupported()
-    
+
   ###*
    * get the plugin device id
    * @return {Object}
@@ -199,8 +199,8 @@ class gciprinter
       return false
 
     if (self.cacheResult.isPrinterSupported?)
-      return self.cacheResult.isPrinterSupported 
-    
+      return self.cacheResult.isPrinterSupported
+
     return self.cacheResult.isPrinterSupported = COUPONSINC.printcontrol.isPrinterSupported()
 
   ###*
@@ -213,7 +213,7 @@ class gciprinter
     if !self.isReady
       gcprinter.log "isPluginBlocked - false - #{initRequiredMsg}"
       return false
-    result = !self.isWebSocket()  
+    result = !self.isWebSocket()
     if result
       result = COUPONSINC.printcontrol_plugin.isPluginBlocked()
     return result
@@ -240,7 +240,7 @@ class gciprinter
     if !self.isReady
       gcprinter.log "getStatus - false - #{initRequiredMsg}"
       return false
-    
+
     if (self.initResult? and self.initResult.deviceId < 0)
       return self.initResult.status
 
@@ -255,30 +255,83 @@ class gciprinter
     self = @
     if isWindows or self.isWindows
       return self.dl.win
-    
+
     return self.dl.mac
 
   ###*
+   * detect plugin with socket
+   * @param  {[type]} timeout   [description]
+   * @param  {[type]} cbSuccess [description]
+   * @param  {[type]} cbFailure [description]
+   * @param  {[type]} retries   [description]
+   * @return {[type]}           [description]
+  ###
+  detectWithSocket: (timeout, cbSuccess, cbFailure, retries) ->
+    self = @
+    self.retries = retries
+    self.log "self check socket"
+    try 
+      socket = new WebSocket('ws://localhost:26876')
+      socket.onopen = () ->
+        self.log "self check socket success"
+        socket.close()
+        cbSuccess()
+      socket.onerror = (error) ->
+        self.log "self check socket failed, retries remain #{retries}"
+        socket.close()
+        win.setTimeout ->
+          if (self.retries <= 1)
+            cbFailure()
+            return self
+
+          self.detectWithSocket timeout, cbSuccess, cbFailure, self.retries - 1
+          return self;
+        , timeout
+
+        return self
+    catch exception
+      cbFailure()
+
+    return self
+
+  ###*
    * initialize COUPONSINC object
+   * @param  {Boolean} force to restart init
    * @return {Object}
   ###
-  init: () ->
+  init: (force) ->
     self = gcprinter
+    if force 
+     self.isReady = false
+     self.hasInit = false
+
     if !self.isReady and COUPONSINC?
-      if (self.hasInit) then return self
+      if self.hasInit then return self
       self.hasInit = true
-      self.log "init starting"
+      type = self.key || if self.isChrome then 'new' else 'old'
+      self.log "init starting #{type}"
       cb = (e) ->
         self.log "init completed"
         self.isReady = true
         self.initResult = e
-  
+
         if e?
           jQuery.extend(self.cacheResult, e)
           self.cacheResult.isPrinterSupported = if e.isPrinterSupported is 0 then false else true
-  
+
         self.emit('initcomplete', self)
-      jQuery.when(COUPONSINC.printcontrol.init(self.key, isSecureSite)).then cb, cb
+
+
+      myCb = () ->
+        self.log "actual plugin init"
+        jQuery.when(COUPONSINC.printcontrol.init(type, isSecureSite)).then cb, cb
+
+      # do our own socket check first
+      if (type is 'new')
+        self.detectWithSocket 5, myCb, myCb, 1
+      else
+        myCb()
+      
     return self
 
 Emitter(gciprinter.prototype)

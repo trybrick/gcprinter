@@ -2,7 +2,7 @@
   "name": "gcprinter",
   "repo": "gsn/gcprinter",
   "description": "gsn coupons inc. printer",
-  "version": "0.1.8",
+  "version": "0.1.10",
   "keywords": [
     "modal",
     "web"
