@@ -198,7 +198,7 @@ class gciprinter
       gcprinter.log "isPrinterSupported - false - #{initRequiredMsg}"
       return false
 
-    if (self.cacheResult.isPrinterSupported?)
+    if (self.cacheResult.isPrinterSupported? and self.cacheResult.isPrinterSupported is on)
       return self.cacheResult.isPrinterSupported
 
     return self.cacheResult.isPrinterSupported = COUPONSINC.printcontrol.isPrinterSupported()
