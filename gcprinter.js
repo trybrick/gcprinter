@@ -332,7 +332,7 @@
         gcprinter.log("getDeviceId - 0 - " + initRequiredMsg);
         return 0;
       }
-      if ((self.cacheResult.deviceId != null)) {
+      if ((self.cacheResult.deviceId != null) && self.cacheResult.deviceId > 0) {
         return self.cacheResult.deviceId;
       }
       return self.cacheResult.deviceId = COUPONSINC.printcontrol.getDeviceID();
