@@ -144,8 +144,11 @@ class gciprinter
       else if (fnFail)
         fnFail()
 
-    type = self.key || if self.isChrome then 'new' else 'old'
-    COUPONSINC.printcontrol.installCheck(type, cb)
+    type = self.key || if self.isChrome then 'new' else 'plugin'
+    try
+      COUPONSINC.printcontrol.installCheck(type, cb)
+    catch
+      cb()
     @
 
   ###*
@@ -158,7 +161,10 @@ class gciprinter
     if !self.isReady
       gcprinter.log "hasPlugin - false - #{initRequiredMsg}"
       return false
-    return COUPONSINC.printcontrol.isPrintControlInstalled()
+    try
+      return COUPONSINC.printcontrol.isPrintControlInstalled()
+    catch
+      return false
 
   ###*
    *
@@ -169,7 +175,11 @@ class gciprinter
     if !self.isReady
       gcprinter.log "getUpdateSupported - false - #{initRequiredMsg}"
       return false
-    return COUPONSINC.printcontrol.getUpdateSupported()
+
+    try
+      return COUPONSINC.printcontrol.getUpdateSupported()
+    catch
+      return false
 
   ###*
    * get the plugin device id
@@ -185,8 +195,11 @@ class gciprinter
     if (self.cacheResult.deviceId? and self.cacheResult.deviceId > 0)
       return self.cacheResult.deviceId
 
-    return self.cacheResult.deviceId = COUPONSINC.printcontrol.getDeviceID()
-
+    try
+      return self.cacheResult.deviceId = COUPONSINC.printcontrol.getDeviceID()
+    catch
+      return self.cacheResult.deviceId
+      
   ###*
    * determine if printer is supported (not pdf/xps/virtual printer etc..)
    * @return {Boolean}
@@ -201,7 +214,10 @@ class gciprinter
     if (self.cacheResult.isPrinterSupported? and self.cacheResult.isPrinterSupported is on)
       return self.cacheResult.isPrinterSupported
 
-    return self.cacheResult.isPrinterSupported = COUPONSINC.printcontrol.isPrinterSupported()
+    try
+      return self.cacheResult.isPrinterSupported = COUPONSINC.printcontrol.isPrinterSupported()
+    catch
+      return false
 
   ###*
    * determine if plugin is blocked
@@ -214,8 +230,13 @@ class gciprinter
       gcprinter.log "isPluginBlocked - false - #{initRequiredMsg}"
       return false
     result = !self.isWebSocket()
-    if result
-      result = COUPONSINC.printcontrol_plugin.isPluginBlocked()
+
+    try 
+      if result
+        result = COUPONSINC.printcontrol_plugin.isPluginBlocked()
+    catch
+      result = false
+
     return result
 
   ###*
@@ -228,7 +249,11 @@ class gciprinter
     if !self.isReady
       gcprinter.log "isWebSocket - false - #{initRequiredMsg}"
       return false
-    return COUPONSINC.printcontrol.getManager().getSocket?
+
+    try
+      return COUPONSINC.printcontrol.getManager().getSocket?
+    catch
+      return false
 
   ###*
    * get the current status code
@@ -244,7 +269,10 @@ class gciprinter
     if (self.initResult? and self.initResult.deviceId < 0)
       return self.initResult.status
 
-    return COUPONSINC.printcontrol.getStatusCode()
+    try 
+      return COUPONSINC.printcontrol.getStatusCode()
+    catch
+      return false
 
   ###*
    * get the plugin download url
@@ -308,7 +336,7 @@ class gciprinter
     if !self.isReady and COUPONSINC?
       if self.hasInit then return self
       self.hasInit = true
-      type = self.key || if self.isChrome then 'new' else 'old'
+      type = self.key || if self.isChrome then 'new' else 'plugin'
       self.log "init starting #{type}"
       cb = (e) ->
         self.log "init completed"
