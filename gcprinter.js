@@ -258,7 +258,7 @@
      */
 
     gciprinter.prototype.checkInstall = function(fnSuccess, fnFail) {
-      var cb, self, type;
+      var cb, error1, self, type;
       self = this;
       self.init();
       if (!self.isReady) {
@@ -280,8 +280,12 @@
           return fnFail();
         }
       };
-      type = self.key || (self.isChrome ? 'new' : 'old');
-      COUPONSINC.printcontrol.installCheck(type, cb);
+      type = self.key || (self.isChrome ? 'new' : 'plugin');
+      try {
+        COUPONSINC.printcontrol.installCheck(type, cb);
+      } catch (error1) {
+        cb();
+      }
       return this;
     };
 
@@ -292,14 +296,18 @@
      */
 
     gciprinter.prototype.hasPlugin = function() {
-      var self;
+      var error1, self;
       self = this;
       self.init();
       if (!self.isReady) {
         gcprinter.log("hasPlugin - false - " + initRequiredMsg);
         return false;
       }
-      return COUPONSINC.printcontrol.isPrintControlInstalled();
+      try {
+        return COUPONSINC.printcontrol.isPrintControlInstalled();
+      } catch (error1) {
+        return false;
+      }
     };
 
 
@@ -308,14 +316,18 @@
      */
 
     gciprinter.prototype.getUpdateSupported = function() {
-      var self;
+      var error1, self;
       self = this;
       self.init();
       if (!self.isReady) {
         gcprinter.log("getUpdateSupported - false - " + initRequiredMsg);
         return false;
       }
-      return COUPONSINC.printcontrol.getUpdateSupported();
+      try {
+        return COUPONSINC.printcontrol.getUpdateSupported();
+      } catch (error1) {
+        return false;
+      }
     };
 
 
@@ -325,7 +337,7 @@
      */
 
     gciprinter.prototype.getDeviceId = function() {
-      var self;
+      var error1, self;
       self = this;
       self.init();
       if (!self.isReady) {
@@ -335,7 +347,11 @@
       if ((self.cacheResult.deviceId != null) && self.cacheResult.deviceId > 0) {
         return self.cacheResult.deviceId;
       }
-      return self.cacheResult.deviceId = COUPONSINC.printcontrol.getDeviceID();
+      try {
+        return self.cacheResult.deviceId = COUPONSINC.printcontrol.getDeviceID();
+      } catch (error1) {
+        return self.cacheResult.deviceId;
+      }
     };
 
 
@@ -345,7 +361,7 @@
      */
 
     gciprinter.prototype.isPrinterSupported = function() {
-      var self;
+      var error1, self;
       self = this;
       self.init();
       if (!self.isReady) {
@@ -355,7 +371,11 @@
       if ((self.cacheResult.isPrinterSupported != null) && self.cacheResult.isPrinterSupported === true) {
         return self.cacheResult.isPrinterSupported;
       }
-      return self.cacheResult.isPrinterSupported = COUPONSINC.printcontrol.isPrinterSupported();
+      try {
+        return self.cacheResult.isPrinterSupported = COUPONSINC.printcontrol.isPrinterSupported();
+      } catch (error1) {
+        return false;
+      }
     };
 
 
@@ -365,7 +385,7 @@
      */
 
     gciprinter.prototype.isPluginBlocked = function() {
-      var result, self;
+      var error1, result, self;
       self = this;
       self.init();
       if (!self.isReady) {
@@ -373,8 +393,12 @@
         return false;
       }
       result = !self.isWebSocket();
-      if (result) {
-        result = COUPONSINC.printcontrol_plugin.isPluginBlocked();
+      try {
+        if (result) {
+          result = COUPONSINC.printcontrol_plugin.isPluginBlocked();
+        }
+      } catch (error1) {
+        result = false;
       }
       return result;
     };
@@ -386,14 +410,18 @@
      */
 
     gciprinter.prototype.isWebSocket = function() {
-      var self;
+      var error1, self;
       self = this;
       self.init();
       if (!self.isReady) {
         gcprinter.log("isWebSocket - false - " + initRequiredMsg);
         return false;
       }
-      return COUPONSINC.printcontrol.getManager().getSocket != null;
+      try {
+        return COUPONSINC.printcontrol.getManager().getSocket != null;
+      } catch (error1) {
+        return false;
+      }
     };
 
 
@@ -403,7 +431,7 @@
      */
 
     gciprinter.prototype.getStatus = function() {
-      var self;
+      var error1, self;
       self = this;
       self.init();
       if (!self.isReady) {
@@ -413,7 +441,11 @@
       if ((self.initResult != null) && self.initResult.deviceId < 0) {
         return self.initResult.status;
       }
-      return COUPONSINC.printcontrol.getStatusCode();
+      try {
+        return COUPONSINC.printcontrol.getStatusCode();
+      } catch (error1) {
+        return false;
+      }
     };
 
 
@@ -443,7 +475,7 @@
      */
 
     gciprinter.prototype.detectWithSocket = function(timeout, cbSuccess, cbFailure, retries) {
-      var exception, self, socket;
+      var error1, exception, self, socket;
       self = this;
       self.retries = retries;
       self.log("self check socket");
@@ -467,8 +499,8 @@
           }, timeout);
           return self;
         };
-      } catch (_error) {
-        exception = _error;
+      } catch (error1) {
+        exception = error1;
         cbFailure();
       }
       return self;
@@ -493,7 +525,7 @@
           return self;
         }
         self.hasInit = true;
-        type = self.key || (self.isChrome ? 'new' : 'old');
+        type = self.key || (self.isChrome ? 'new' : 'plugin');
         self.log("init starting " + type);
         cb = function(e) {
           self.log("init completed");
