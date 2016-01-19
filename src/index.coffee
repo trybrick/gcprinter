@@ -71,7 +71,7 @@ class gciprinter
     deviceId = self.getDeviceId()
     if (deviceId < 1)
       gcprinter.log "printinvalid - bad device id #{deviceId}"
-      gcprinter.emit('printinvalid', 'gsn-device')
+      gcprinter.emit('printinvalid', 'brick-device', deviceId)
       return
 
     payload = trim((coupons or []).join(','))
@@ -88,12 +88,12 @@ class gciprinter
             gcprinter.emit('printing', evt, svrRsp)
             gcprinter.printWithToken svrRsp.Token, svrRsp
           else
-            gcprinter.emit('printfail', 'gsn-cancel', svrRsp)
+            gcprinter.emit('printfail', 'brick-cancel', svrRsp)
         else
-          gcprinter.emit('printfail', 'gsn-server', svrRsp)
+          gcprinter.emit('printfail', 'brick-server', svrRsp)
     else
       gcprinter.log "printinvalid - no coupon payload"
-      gcprinter.emit('printinvalid', 'gsn-no-coupon')
+      gcprinter.emit('printinvalid', 'brick-no-coupon')
 
     return true
 
@@ -144,7 +144,7 @@ class gciprinter
       else if (fnFail)
         fnFail()
 
-    type = self.key || if self.isChrome then 'new' else 'plugin'
+    type = self.key || if self.isChrome then 'new' else 'old'
     try
       COUPONSINC.printcontrol.installCheck(type, cb)
     catch
@@ -336,7 +336,7 @@ class gciprinter
     if !self.isReady and COUPONSINC?
       if self.hasInit then return self
       self.hasInit = true
-      type = self.key || if self.isChrome then 'new' else 'plugin'
+      type = self.key || if self.isChrome then 'new' else 'old'
       self.log "init starting #{type}"
       cb = (e) ->
         self.log "init completed"
