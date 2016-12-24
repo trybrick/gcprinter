@@ -1164,7 +1164,7 @@ COUPONSINC.printcontrol_websocket = (function($) {
      */
 
     function onOpen() {
-        console.log('connected succesfully to ' + portToTry);
+        console.log('connected successfully to ' + portToTry);
         if (checkVersion) {
             sendGetVersion();
             checkVersion = false;
